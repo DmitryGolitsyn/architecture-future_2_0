@@ -1,0 +1,58 @@
+@startuml Current_Data_Flow_AS_IS
+!theme plain
+title Data Flow Diagram - Current State (AS-IS)
+
+!define MONOLITH_COLOR #FFCDD2
+!define INTERFACE_COLOR #FFF3E0
+!define EXTERNAL_COLOR #E8F5E8
+
+' External entities
+rectangle "Пациенты" as Patients #E8F5E8
+rectangle "Врачи" as Doctors #E8F5E8
+rectangle "Финансовые\nспециалисты" as Finance_Users #E8F5E8
+rectangle "Аналитики" as Analysts #E8F5E8
+rectangle "Операторы\nклиник" as Operators #E8F5E8
+rectangle "Внешние банки" as External_Banks #E8F5E8
+
+' Current monolithic system
+rectangle "Монолитный DWH\n(SQL Server 2008)\n- Медицинские данные\n- Финансовые данные\n- Инвентарь\n- HR данные\n- Вся бизнес-логика" as MonolithDWH #FFCDD2
+
+' Current interfaces
+rectangle "Power Builder\nИнтерфейс" as PowerBuilder #FFF3E0
+rectangle "Power BI\nОтчеты" as PowerBI #FFF3E0
+rectangle "ИИ-сервисы\n(Python)" as AIServices #FFF3E0
+rectangle "Финтех-сервисы\n(Go/Java)" as FinTechServices #FFF3E0
+
+' Current integration bus
+rectangle "Apache Camel\nИнтеграционная шина" as CamelBus #FFF3E0
+
+' Current data flows
+Patients --> PowerBuilder : "Регистрация,\nзапросы"
+Doctors --> PowerBuilder : "Работа с\nпациентами"
+Operators --> PowerBuilder : "Операционная\nработа"
+
+PowerBuilder --> MonolithDWH : "Все операции\nчерез DWH"
+MonolithDWH --> PowerBuilder : "Данные для\nотображения"
+
+Finance_Users --> PowerBI : "Запросы\nотчетов"
+Analysts --> PowerBI : "Аналитические\nзапросы"
+PowerBI --> MonolithDWH : "Сложные запросы\n(часы ожидания)"
+
+AIServices --> CamelBus : "AI обработка\nмедданных"
+FinTechServices --> CamelBus : "Финансовые\nоперации"
+CamelBus --> MonolithDWH : "Интеграция\nчерез шину"
+
+FinTechServices --> External_Banks : "Банковские\nоперации"
+
+MonolithDWH --> CamelBus : "Данные для\nвнешних сервисов"
+CamelBus --> AIServices : "Медицинские\nданные"
+CamelBus --> FinTechServices : "Финансовые\nданные"
+
+' Problems indicated
+note top of MonolithDWH : **ПРОБЛЕМЫ:**\n• Все данные в одном месте\n• Сложные отчеты генерируются часами\n• Невозможно независимое развитие\n• Высокая связанность\n• Устаревшие технологии
+
+note right of PowerBI : **ПРОБЛЕМЫ:**\n• Медленные запросы\n• Нет self-service\n• Зависимость от IT
+
+note left of CamelBus : **ПРОБЛЕМЫ:**\n• Узкое место интеграций\n• Сложность добавления\nновых систем
+
+@enduml 
