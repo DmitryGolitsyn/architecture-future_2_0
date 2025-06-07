@@ -1,0 +1,105 @@
+@startuml Data_Flow_Diagram_Future_Architecture
+!theme plain
+title Data Flow Diagram - "Будущее 2.0" (Future Architecture)
+
+!define DOMAIN_COLOR #E1F5FE
+!define DATASTORE_COLOR #F3E5F5
+!define EXTERNAL_COLOR #FFF3E0
+!define EVENT_COLOR #E8F5E8
+
+' External entities
+rectangle "Пациенты" as Patients #FFF3E0
+rectangle "Врачи" as Doctors #FFF3E0
+rectangle "Финансовые\nспециалисты" as Finance_Users #FFF3E0
+rectangle "Аналитики" as Analysts #FFF3E0
+rectangle "Админы" as Admins #FFF3E0
+rectangle "Внешние банки" as External_Banks #FFF3E0
+rectangle "Поставщики\nоборудования" as Equipment_Suppliers #FFF3E0
+rectangle "Поставщики\nлекарств" as Pharma_Suppliers #FFF3E0
+
+' Domain processes
+rectangle "Healthcare\nDomain" as Healthcare #E1F5FE
+rectangle "FinTech\nDomain" as FinTech #E1F5FE
+rectangle "Equipment &\nSupply Domain" as Equipment #E1F5FE
+rectangle "Analytics &\nReporting Domain" as Analytics #E1F5FE
+rectangle "Pharmacy\nDomain" as Pharmacy #E1F5FE
+rectangle "Corporate\nDomain" as Corporate #E1F5FE
+
+' Data stores
+database "Patient Records\nDB" as PatientDB #F3E5F5
+database "Financial\nDB" as FinancialDB #F3E5F5
+database "Equipment\nDB" as EquipmentDB #F3E5F5
+database "Analytics\nDB" as AnalyticsDB #F3E5F5
+database "Pharmacy\nDB" as PharmacyDB #F3E5F5
+database "Corporate\nDB" as CorporateDB #F3E5F5
+
+' Integration layer
+rectangle "Event\nStreaming\n(Kafka)" as EventBus #E8F5E8
+rectangle "API\nGateway" as APIGateway #E8F5E8
+rectangle "Data Portal\n(Self-service BI)" as DataPortal #E8F5E8
+
+' Legacy system
+rectangle "Legacy DWH\n(Read-Only)" as LegacyDWH #FFEBEE
+
+' Patient interactions
+Patients --> APIGateway : "Запросы на\nмедуслуги"
+APIGateway --> Healthcare : "Данные пациентов"
+Healthcare --> PatientDB : "Медкарты,\nистории болезни"
+
+' Doctor interactions  
+Doctors --> APIGateway : "Работа с\nпациентами"
+APIGateway --> Healthcare : "Диагнозы,\nназначения"
+Healthcare --> Pharmacy : "Рецепты"
+Pharmacy --> PharmacyDB : "Лекарства,\nназначения"
+
+' Financial flows
+Patients --> APIGateway : "Платежи,\nкредиты"
+APIGateway --> FinTech : "Финансовые\nоперации"
+FinTech --> FinancialDB : "Транзакции,\nкредиты"
+FinTech --> External_Banks : "Банковские\nоперации"
+
+' Equipment management
+Corporate --> APIGateway : "Управление\nоборудованием"
+APIGateway --> Equipment : "Закупки,\nобслуживание"
+Equipment --> EquipmentDB : "Инвентарь,\nТО"
+Equipment_Suppliers --> Equipment : "Поставки\nоборудования"
+
+' Pharmacy supply chain
+Pharma_Suppliers --> Pharmacy : "Поставки\nлекарств"
+Pharmacy --> Equipment : "Потребности\nв оборудовании"
+
+' Analytics and reporting
+Finance_Users --> DataPortal : "Финансовые\nотчеты"
+Analysts --> DataPortal : "Бизнес\nаналитика"
+Admins --> DataPortal : "Операционные\nотчеты"
+DataPortal --> Analytics : "Запросы\nна данные"
+Analytics --> AnalyticsDB : "Агрегированные\nданные"
+
+' Corporate functions
+Corporate --> CorporateDB : "HR данные,\nполитики"
+Corporate --> Analytics : "Стратегические\nзапросы"
+
+' Event-driven integration
+Healthcare --> EventBus : "Медицинские\nсобытия"
+FinTech --> EventBus : "Финансовые\nсобытия"
+Equipment --> EventBus : "События\nоборудования"
+Pharmacy --> EventBus : "Фармацевтические\nсобытия"
+Corporate --> EventBus : "Корпоративные\nсобытия"
+
+EventBus --> Analytics : "События для\nаналитики"
+EventBus --> Healthcare : "События от\nдругих доменов"
+EventBus --> FinTech : "События для\nфинансов"
+EventBus --> Equipment : "События для\nоборудования"
+EventBus --> Pharmacy : "События для\nфармации"
+
+' Legacy integration (migration phase)
+LegacyDWH --> Analytics : "Исторические\nданные (CDC)"
+Healthcare --> LegacyDWH : "Синхронизация\n(переходный период)"
+
+' Cross-domain data flows
+Healthcare --> FinTech : "ID пациентов\nдля биллинга"
+Equipment --> Healthcare : "Доступность\nоборудования"
+Pharmacy --> Healthcare : "Статус\nрецептов"
+Corporate --> Healthcare : "Данные\nперсонала"
+
+@enduml 
