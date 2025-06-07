@@ -1,0 +1,36 @@
+@startuml Migration_Timeline_Simple
+!theme blueprint
+title План миграции "Будущее 2.0" (12 месяцев)
+
+participant "Месяц 1-3\nФаза 1: Фундамент" as Phase1
+participant "Месяц 4-6\nФаза 2: Данные" as Phase2
+participant "Месяц 7-9\nФаза 3: Сервисы" as Phase3
+participant "Месяц 10-12\nФаза 4: UI" as Phase4
+
+Phase1 -> Phase1: Kubernetes кластер
+Phase1 -> Phase1: CI/CD pipeline
+Phase1 -> Phase1: Monitoring setup
+Phase1 -> Phase1: Разделение доменов
+Phase1 -> Phase1: Apache Kafka
+
+Phase1 -> Phase2: Переход к данным
+
+Phase2 -> Phase2: ClickHouse кластер
+Phase2 -> Phase2: ETL процессы
+Phase2 -> Phase2: PostgreSQL setup
+Phase2 -> Phase2: Elasticsearch
+
+Phase2 -> Phase3: Переход к сервисам
+
+Phase3 -> Phase3: API Gateway
+Phase3 -> Phase3: Domain APIs
+Phase3 -> Phase3: ML Platform
+
+Phase3 -> Phase4: Переход к UI
+
+Phase4 -> Phase4: Data Portal
+Phase4 -> Phase4: Performance
+Phase4 -> Phase4: Legacy read-only
+Phase4 -> Phase4: Training
+
+@enduml 
